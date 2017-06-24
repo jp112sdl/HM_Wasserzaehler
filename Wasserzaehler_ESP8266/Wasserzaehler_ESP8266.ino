@@ -12,6 +12,10 @@ SoftwareSerial ATM328(D5, D6);
 #define Taster D7
 
 unsigned long oldMillis = 0;
+unsigned long keyPressMillis = 0;
+
+boolean oldKeyState = HIGH;
+boolean counterReset = false;
 
 String incomingStr;
 
@@ -24,7 +28,7 @@ char variable[255]  = "";
 
 //WifiManager - don't touch
 bool shouldSaveConfig        = false;
-#define wifiManagerDebugOutput   true
+#define wifiManagerDebugOutput   false
 char ip[15]      = "0.0.0.0";
 char netmask[15] = "0.0.0.0";
 char gw[15]      = "0.0.0.0";
@@ -77,12 +81,37 @@ void setup() {
     setStateCCUCUxD(variable, String(ZaehlerWert));
   }
   else ESP.restart();
-
 }
 
 void loop() {
+  if (digitalRead(Taster) == LOW) {
+    if (!counterReset) {
+      display.clearDisplay();
+      display.setCursor(0, 0);
+      display.setTextColor(WHITE, BLACK);
+      display.println("Hold to");
+      display.println("reset");
+      display.println("counter");
+      display.display();
+    }
 
-  if (millis() - oldMillis > 1000) {
+    if (oldKeyState == HIGH) {
+      oldKeyState = LOW;
+      keyPressMillis = millis();
+    }
+    if (millis() - keyPressMillis > 5000 && !counterReset) {
+      ZaehlerWert = 0;
+      saveSysConfig();
+      setStateCCUCUxD(variable, String(ZaehlerWert));
+      display.println( ""); display.println( "- OK -"); display.display();
+      counterReset = true;
+    }
+  } else {
+    oldKeyState = HIGH;
+    counterReset = false;
+  }
+
+  if (millis() - oldMillis > 1000 && digitalRead(Taster) != LOW) {
     display.clearDisplay();
     display.setCursor(0, 5);
     display.setTextColor(BLACK, WHITE);
@@ -90,7 +119,7 @@ void loop() {
     display.setTextColor(WHITE, BLACK);
     display.println("          ");
     for (int i = 10; i > ((String)ZaehlerWert).length(); i--)
-    display.print(" ");
+      display.print(" ");
     display.println(ZaehlerWert);
     display.println("          ");
     display.setTextColor(BLACK, WHITE);
