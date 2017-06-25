@@ -28,7 +28,7 @@ char variable[255]  = "";
 
 //WifiManager - don't touch
 bool shouldSaveConfig        = false;
-#define wifiManagerDebugOutput   false
+#define wifiManagerDebugOutput   true
 char ip[15]      = "0.0.0.0";
 char netmask[15] = "0.0.0.0";
 char gw[15]      = "0.0.0.0";
@@ -127,7 +127,7 @@ void loop() {
     display.display();
   }
 
-  if (ATM328.available() > 0) {
+  if (ATM328.available()) {
     incomingStr = ATM328.readString();
     ZaehlerWert = ZaehlerWert + incomingStr.toInt();
     saveSysConfig();
