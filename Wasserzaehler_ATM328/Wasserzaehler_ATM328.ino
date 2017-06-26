@@ -3,9 +3,9 @@
 #define RX  6
 #define TX  5
 
-#define TransmitDelaySeconds        10
-#define ReTransmitDeslaySeconds     6
-#define InputPulesDelayMilliSeconds 1000
+#define TransmitDelaySeconds        30
+#define ReTransmitDeslaySeconds     10
+#define InputPulseDelayMilliSeconds 350
 
 SoftwareSerial ESP8266(RX, TX);
 
@@ -16,12 +16,13 @@ unsigned long oldMillis = 0;
 unsigned long cntMillis = 0;
 unsigned long timeoutMillis = 0;
 String incomingStr;
-boolean oldPinState = HIGH;
+boolean oldPinState = LOW;
 
 void setup() {
   pinMode(LDR, INPUT_PULLUP);
   ESP8266.begin(9600);
   Serial.begin(115200);
+  Serial.println("Ready");
 }
 
 void loop() {
@@ -35,16 +36,22 @@ void loop() {
     timeoutMillis = 0;
 
   //Eingangs-Pin überwachen (attachInterrupt funktioniert am Arduino Pro mini nicht zuverlässig!)
-  if (digitalRead(LDR) == HIGH) {
-    if ((millis() - cntMillis > InputPulesDelayMilliSeconds)  && oldPinState == LOW) {
-      cnt++;
-      cntMillis = millis();
-      oldPinState = HIGH;
-      Serial.println("IMPULS erkannt");
+  if (digitalRead(LDR) == LOW) {
+    if (oldPinState == HIGH) {
+      //Serial.println("LDR = LOW!");
+      if ((millis() - cntMillis > InputPulseDelayMilliSeconds) ) {
+        cnt++;
+        Serial.println("IMPULS erkannt");
+        Serial.println("Millis Diff = " + String((millis() - cntMillis)));
+      }
+      oldPinState = LOW;
     }
   } else {
-    oldPinState = LOW;
-    cntMillis = millis();
+    if (oldPinState == LOW) {
+      //Serial.println("LDR = HIGH!");
+      oldPinState = HIGH;
+      cntMillis = millis();
+    }
   }
 
   if (millis() - oldMillis > 1000 * TransmitDelaySeconds) {
@@ -74,6 +81,7 @@ void loop() {
       Serial.println("Empfang bestaetigt.");
     }
   }
+  delay(10);
 }
 
 

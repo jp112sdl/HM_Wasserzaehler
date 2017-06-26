@@ -10,12 +10,12 @@ bool doWifiConnect() {
   wifiManager.setDebugOutput(wifiManagerDebugOutput);
   wifiManager.setAPCallback(configModeCallback);
   wifiManager.setSaveConfigCallback(saveConfigCallback);
-  WiFiManagerParameter custom_ccuip("ccuip", "CCU IP", ccuip, 15);
+  WiFiManagerParameter custom_ccuip("ccuip", "CCU IP", ccuip, 16);
   WiFiManagerParameter custom_variable("variable", "Variablenname", variable, 255);
 
-  WiFiManagerParameter custom_ip("custom_ip", "IP-Adresse", "", 15);
-  WiFiManagerParameter custom_netmask("custom_netmask", "Netzmaske", "", 15);
-  WiFiManagerParameter custom_gw("custom_gw", "Gateway", "", 15);
+  WiFiManagerParameter custom_ip("custom_ip", "IP-Adresse", "", 16);
+  WiFiManagerParameter custom_netmask("custom_netmask", "Netzmaske", "", 16);
+  WiFiManagerParameter custom_gw("custom_gw", "Gateway", "", 16);
   WiFiManagerParameter custom_text("<br/><br>Statische IP (wenn leer, dann DHCP):");
   wifiManager.addParameter(&custom_ccuip);
   wifiManager.addParameter(&custom_variable);
@@ -29,6 +29,8 @@ bool doWifiConnect() {
   char a[] = "";
   Hostname.toCharArray(a, 30);
 
+  wifiManager.setConfigPortalTimeout(180);
+  
   if (startWifiManager == true) {
     if (_ssid == "" || _psk == "" ) {
       wifiManager.resetSettings();
@@ -59,7 +61,7 @@ bool doWifiConnect() {
       strcpy(netmask, "0.0.0.0");
       strcpy(gw,      "0.0.0.0");
     }
- 
+
     strcpy(ccuip, custom_ccuip.getValue());
     strcpy(variable, custom_variable.getValue());
 

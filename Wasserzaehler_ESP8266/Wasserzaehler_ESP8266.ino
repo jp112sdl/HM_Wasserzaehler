@@ -23,15 +23,15 @@ int ZaehlerWert = 0;
 
 String configFilename = "sysconf.json";
 
-char ccuip[15] = "";
+char ccuip[16] = "";
 char variable[255]  = "";
 
 //WifiManager - don't touch
 bool shouldSaveConfig        = false;
 #define wifiManagerDebugOutput   true
-char ip[15]      = "0.0.0.0";
-char netmask[15] = "0.0.0.0";
-char gw[15]      = "0.0.0.0";
+char ip[16]      = "0.0.0.0";
+char netmask[16] = "0.0.0.0";
+char gw[16]      = "0.0.0.0";
 bool startWifiManager = false;
 
 void setup() {
