@@ -13,5 +13,7 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 - Wemos D1 OLED Shield
 - Arduino Pro Mini (ATtiny85-Unterstützung ist in Arbeit - wird umgesetzt, sobald die Lieferung da ist)
 - stabiles! 5V Netzteil
-
+- 1 Taster
+- 1 LED 3mm grün
+- 1 Phototransistor SFH 309-5
 
