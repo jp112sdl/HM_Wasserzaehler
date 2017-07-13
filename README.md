@@ -20,6 +20,7 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 - 1 Widerstand 270Ohm
 - 1 Widerstand 100kOhm
 
+Auf dem OLED Display wird später die Anzahl der gezählten Impulse angezeigt.
 
 ## elektronischer Aufbau
 ![Wiring](Images/Schaltplan.png)
@@ -30,3 +31,39 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 
 ![Assembly](Images/Assembly.jpeg)
 #### Zusammengebaut (von unten nach oben): Wemos D1 mini - Arduino Pro Mini - OLED Display
+
+## Der CODE
+### Wasserzaehler_ESP8266
+Beim Öffnen der ```Wasserzaehler_ESP8266.ino``` in der Arduino IDE werden automatisch die anderen Projektdateien mitgeladen.
+Der Code kann kompiliert und ohne weitere benutzerdefinierten Anpassungen auf den Wemos D1 mini geflasht werden.
+
+### Wasserzaehler_ATM328
+Hier sind folgende Anpassungen zu machen:
+
+  ```#define DEBUG                        false```
+  
+  serielle Debug-Meldungen ausgeben (115200 Baud)
+  
+  Sinnvoll, um die High/Low Schwellen bei der Positionierung der Abtasteinheit zu ermitteln
+  
+  ```#define TransmitDelaySeconds         15```
+  
+  Verzögerung, nach wie vielen Sekunden der Zählwert übertragen werden soll
+  
+  ```#define ReTransmitDelaySeconds       10```
+  
+  Alle wie viel Sekunden soll der Zählwert an den Wemos D1 erneut übertragen werden, wenn dieser nicht erreichbar sein sollte
+  
+  ```#define PulseDelayMilliSeconds       500```
+  
+  Mindestabstand in Millisekunden zwischen 2 Impulsen
+  
+  ```#define LDRHIGH                      540```
+  
+  Über diesem Wert wird ein "HIGH"-Level erkannt
+  
+  ```#define LDRLOW                       490```
+  
+  Unter diesem Wert wird ein "LOW"-Level erkannt
+  
+
