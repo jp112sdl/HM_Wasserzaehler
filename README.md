@@ -12,8 +12,10 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 - Wemos D1 Mini
 - Wemos D1 OLED Shield
 - Arduino Pro Mini (ATtiny85-Unterstützung ist in Arbeit - wird umgesetzt, sobald die Lieferung da ist)
+  - +FTDI Adapter zum Programmieren des Arduino Pro Mini
 - stabiles! 5V Netzteil
 - 1 Taster
-- 1 LED 3mm grün
-- 1 Phototransistor SFH 309-5
+- 1 LED 3mm grün, klar, mit sehr hoher Helligkeit (je heller desto besser, ich verwende 12.000mcd)
+- 1 Phototransistor SFH 309-5 (klar oder schwarz)
+
 
