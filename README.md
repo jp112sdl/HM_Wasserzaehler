@@ -22,6 +22,10 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 
 Auf dem OLED Display wird später die Anzahl der gezählten Impulse angezeigt.
 
+
+
+Der aktuelle Zählwert wird im Flash des Wemos gespeichert, sodass auch nach einem Stromausfall der letzte Wert gespeichert bleibt.
+
 ## elektronischer Aufbau
 ![Wiring](Images/Schaltplan.png)
 #### Schaltplan
@@ -66,4 +70,29 @@ Hier sind folgende Anpassungen zu machen:
   
   Unter diesem Wert wird ein "LOW"-Level erkannt
   
+## Die CCU
+
+Seitens der CCU ist lediglich eine Systemvariable vom Typ "Zahl" in der WebUI anzulegen.
+
+Der Name der Variable ist dann im WifiManager einzutragen.
+
+## Inbetriebnahme
+
+Um den Konfigurationsmodus zu starten, muss der Wemos D1 mit gedrückt gehaltenem Taster gestartet werden.
+
+Auf dem Handy oder Notebook sucht man nun nach neuen WLAN Netzen in der Umgebung. 
+
+Es erscheint ein neues WLAN mit dem Namen "ESP-WZ-xx:xx:xx:xx:xx:xx"
+
+Nachdem man sich mit diesem verbunden hat, öffnet sich automatisch das Konfigurationsportal.
+
+Geschieht dies nicht nach ein paar Sekunden, ist im Browser die Seite http://192.168.4.1 aufzurufen.
+
+**SSID**: WLAN aus der Liste auswählen, oder SSID manuell eingeben
+
+**WLAN-Key**: WLAN Passwort
+
+**IP der CCU2**: selbsterklärend
+
+**Variablenname**: Name der Systemvariable, die in der WebUI der CCU angelegt wurde
 
