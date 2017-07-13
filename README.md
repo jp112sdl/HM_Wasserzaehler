@@ -17,5 +17,16 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 - 1 Taster
 - 1 LED 3mm grün, klar, mit sehr hoher Helligkeit (je heller desto besser, ich verwende 12.000mcd)
 - 1 Phototransistor SFH 309-5 (klar oder schwarz)
+- 1 Widerstand 270Ohm
+- 1 Widerstand 100kOhm
 
 
+## elektronischer Aufbau
+![Wiring](Images/Schaltplan.png)
+#### Schaltplan
+
+![OLEDStack](Images/Wemos_OLED_Stack.png)
+#### Das OLED-Display wird einfach "huckepack" mit dem Wemos D1 mini verbunden und verlötet.
+
+![Assembly](Images/Assembly.jpeg)
+#### Zusammengebaut (von unten nach oben): Wemos D1 mini - Arduino Pro Mini - OLED Display
