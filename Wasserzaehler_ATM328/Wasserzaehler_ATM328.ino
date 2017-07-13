@@ -5,23 +5,26 @@
 
 #define DEBUG                        false
 #define TransmitDelaySeconds         15
-#define ReTransmitDeslaySeconds      10
+#define ReTransmitDelaySeconds       10
 #define PulseDelayMilliSeconds       500
-#define LDRHIGH                      540  //Anbau = 250; Haus = 610
-#define LDRLOW                       490   //Anbau = 50; Haus = 550
+#define LDRHIGH                      540   //Anbau = 250; Haus = 540
+#define LDRLOW                       490   //Anbau = 50;  Haus = 490
 
 SoftwareSerial ESP8266(RX, TX);
 
-int cnt = 0;
-int sentCnt = 0;
-bool ack = true;
-unsigned long oldMillis = 0;
+int pulseCount = 0;
+int sentPulseCount = 0;
+
+bool transmitAck = true;
+bool oldPinState = HIGH;
+bool LDRstate = LOW;
+
+unsigned long oldTransmitDelayMillis = 0;
 unsigned long pulseDiffMillis = 0;
-unsigned long timeoutMillis = 0;
+unsigned long transmitTimeoutMillis = 0;
 unsigned long debugMillis = 0;
+
 String incomingStr;
-boolean oldPinState = HIGH;
-boolean LDRstate = LOW;
 
 void setup() {
   pinMode(LDR, INPUT);
@@ -32,17 +35,17 @@ void setup() {
 }
 
 void loop() {
-  if (oldMillis > millis())
-    oldMillis = 0;
+  if (oldTransmitDelayMillis > millis())
+    oldTransmitDelayMillis = 0;
 
   if (pulseDiffMillis > millis())
     pulseDiffMillis = 0;
 
-  if (timeoutMillis > millis())
-    timeoutMillis = 0;
+  if (transmitTimeoutMillis > millis())
+    transmitTimeoutMillis = 0;
 
   if (debugMillis > millis())
-    timeoutMillis = 0;
+    debugMillis = 0;
 
   int LDRval = analogRead(LDR);
   if (LDRval > LDRHIGH) LDRstate = HIGH;
@@ -53,7 +56,7 @@ void loop() {
     if (oldPinState == LOW) {
       Serial.println("LOW -> HIGH (" + String(LDRval) + ")");
       if ((millis() - pulseDiffMillis > PulseDelayMilliSeconds) ) {
-        if (!DEBUG) cnt++;
+        if (!DEBUG) pulseCount++;
         Serial.print("IMPULS erkannt ");
         Serial.println("Millis Diff = " + String((millis() - pulseDiffMillis)));
       }
@@ -72,30 +75,30 @@ void loop() {
     Serial.println("Analogwert = " + String(LDRval));
   }
 
-  if (millis() - oldMillis > 1000 * TransmitDelaySeconds) {
-    if (cnt > 0 & ack) {
-      Serial.println("Sende Count " + String(cnt));
-      ESP8266.print(String(cnt));
-      ack = false;
-      sentCnt = cnt;
-      cnt = 0;
-      timeoutMillis = millis();
+  if (millis() - oldTransmitDelayMillis > 1000 * TransmitDelaySeconds) {
+    if (pulseCount > 0 & transmitAck) {
+      Serial.println("Sende Count " + String(pulseCount));
+      ESP8266.print(String(pulseCount));
+      transmitAck = false;
+      sentPulseCount = pulseCount;
+      pulseCount = 0;
+      transmitTimeoutMillis = millis();
     }
-    oldMillis = millis();
+    oldTransmitDelayMillis = millis();
   }
 
-  if (!ack && millis() - timeoutMillis > 1000 * ReTransmitDeslaySeconds) {
+  if (!transmitAck && millis() - transmitTimeoutMillis > 1000 * ReTransmitDelaySeconds) {
     Serial.println("Transmit Timeout -> Retransmit");
-    ESP8266.print(String(sentCnt));
-    timeoutMillis = millis();
+    ESP8266.print(String(sentPulseCount));
+    transmitTimeoutMillis = millis();
   }
 
   if (ESP8266.available()) {
     incomingStr = ESP8266.readString();
     Serial.println("Incoming:" + incomingStr);
-    if (incomingStr.toInt() == sentCnt)  {
-      sentCnt = 0;
-      ack = true;
+    if (incomingStr.toInt() == sentPulseCount)  {
+      sentPulseCount = 0;
+      transmitAck = true;
       Serial.println("Empfang bestaetigt.");
     }
   }

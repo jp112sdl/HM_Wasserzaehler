@@ -14,8 +14,8 @@ SoftwareSerial ATM328(D5, D6);
 unsigned long oldMillis = 0;
 unsigned long keyPressMillis = 0;
 
-boolean oldKeyState = HIGH;
-boolean counterReset = false;
+bool oldKeyState = HIGH;
+bool counterReset = false;
 
 String incomingStr;
 
