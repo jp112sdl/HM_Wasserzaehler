@@ -12,8 +12,8 @@
 
 SoftwareSerial ESP8266(RX, TX);
 
-int pulseCount = 0;
-int sentPulseCount = 0;
+unsigned int pulseCount = 0;
+unsigned int sentPulseCount = 0;
 
 bool transmitAck = true;
 bool oldPinState = HIGH;

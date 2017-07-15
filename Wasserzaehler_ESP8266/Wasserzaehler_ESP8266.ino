@@ -19,7 +19,10 @@ bool counterReset = false;
 
 String incomingStr;
 
-int ZaehlerWert = 0;
+unsigned int maxDiff = 1000;
+
+unsigned int ZaehlerWert = 0;
+unsigned int oldZaehlerWert = 0;
 
 String configFilename = "sysconf.json";
 
@@ -129,9 +132,16 @@ void loop() {
 
   if (ATM328.available()) {
     incomingStr = ATM328.readString();
-    ZaehlerWert = ZaehlerWert + incomingStr.toInt();
-    saveSysConfig();
-    setStateCCUCUxD(variable, String(ZaehlerWert));
-    ATM328.print(incomingStr);
+    int incomingInt = incomingStr.toInt();
+    Serial.println("incomingStr = "+incomingStr);
+    if (incomingInt > 0) {
+      oldZaehlerWert = ZaehlerWert;
+      ZaehlerWert = ZaehlerWert + incomingInt;
+      if (ZaehlerWert - oldZaehlerWert < maxDiff) {
+        saveSysConfig();
+        setStateCCUCUxD(variable, String(ZaehlerWert));
+      }
+      ATM328.print(incomingStr);
+    }
   }
 }

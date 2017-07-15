@@ -29,7 +29,7 @@ bool doWifiConnect() {
   char a[] = "";
   Hostname.toCharArray(a, 30);
 
-  wifiManager.setConfigPortalTimeout(18 0);
+  wifiManager.setConfigPortalTimeout(180);
   
   if (startWifiManager == true) {
     if (_ssid == "" || _psk == "" ) {
