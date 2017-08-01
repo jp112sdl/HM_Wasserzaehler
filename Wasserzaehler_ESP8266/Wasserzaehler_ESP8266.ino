@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ArduinoOTA.h>
 
 Adafruit_SSD1306 display(0);
 SoftwareSerial ATM328(D5, D6);
@@ -19,10 +20,7 @@ bool counterReset = false;
 
 String incomingStr;
 
-unsigned int maxDiff = 1000;
-
 unsigned int ZaehlerWert = 0;
-unsigned int oldZaehlerWert = 0;
 
 String configFilename = "sysconf.json";
 
@@ -84,9 +82,29 @@ void setup() {
     setStateCCUCUxD(variable, String(ZaehlerWert));
   }
   else ESP.restart();
+  startOTAhandling();
 }
 
 void loop() {
+  ArduinoOTA.handle();
+
+  if (ATM328.available()) {
+    incomingStr = ATM328.readString();
+    if (incomingStr.startsWith(";")) {
+      incomingStr = incomingStr.substring(1,incomingStr.length());
+      incomingStr = incomingStr.substring(0,incomingStr.indexOf(";"));
+      Serial.println("incomingStr = " + incomingStr);
+      if (incomingStr.toInt() < 2147483646) {
+        ZaehlerWert = ZaehlerWert + incomingStr.toInt();
+        saveSysConfig();
+        if (!setStateCCUCUxD(variable, String(ZaehlerWert))) {
+          setStateCCUCUxD(variable, String(ZaehlerWert));
+        }
+      }
+    }
+    ATM328.print("ACK;ACK;ACK");
+  }
+
   if (digitalRead(Taster) == LOW) {
     if (!counterReset) {
       display.clearDisplay();
@@ -105,7 +123,9 @@ void loop() {
     if (millis() - keyPressMillis > 5000 && !counterReset) {
       ZaehlerWert = 0;
       saveSysConfig();
-      setStateCCUCUxD(variable, String(ZaehlerWert));
+      if (!setStateCCUCUxD(variable, String(ZaehlerWert))) {
+        setStateCCUCUxD(variable, String(ZaehlerWert));
+      }
       display.println( ""); display.println( "- OK -"); display.display();
       counterReset = true;
     }
@@ -128,20 +148,5 @@ void loop() {
     display.setTextColor(BLACK, WHITE);
     display.println("          ");
     display.display();
-  }
-
-  if (ATM328.available()) {
-    incomingStr = ATM328.readString();
-    int incomingInt = incomingStr.toInt();
-    Serial.println("incomingStr = "+incomingStr);
-    if (incomingInt > 0) {
-      oldZaehlerWert = ZaehlerWert;
-      ZaehlerWert = ZaehlerWert + incomingInt;
-      if (ZaehlerWert - oldZaehlerWert < maxDiff) {
-        saveSysConfig();
-        setStateCCUCUxD(variable, String(ZaehlerWert));
-      }
-      ATM328.print(incomingStr);
-    }
   }
 }

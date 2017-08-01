@@ -7,7 +7,7 @@
 #define TransmitDelaySeconds         15
 #define ReTransmitDelaySeconds       10
 #define PulseDelayMilliSeconds       500
-#define LDRHIGH                      540   //Anbau = 250; Haus = 540
+#define LDRHIGH                      540   //Anbau = 220; Haus = 540
 #define LDRLOW                       490   //Anbau = 50;  Haus = 490
 
 SoftwareSerial ESP8266(RX, TX);
@@ -78,7 +78,7 @@ void loop() {
   if (millis() - oldTransmitDelayMillis > 1000 * TransmitDelaySeconds) {
     if (pulseCount > 0 & transmitAck) {
       Serial.println("Sende Count " + String(pulseCount));
-      ESP8266.print(String(pulseCount));
+      ESP8266.print(";"+String(pulseCount)+";");
       transmitAck = false;
       sentPulseCount = pulseCount;
       pulseCount = 0;
@@ -89,14 +89,14 @@ void loop() {
 
   if (!transmitAck && millis() - transmitTimeoutMillis > 1000 * ReTransmitDelaySeconds) {
     Serial.println("Transmit Timeout -> Retransmit");
-    ESP8266.print(String(sentPulseCount));
+    ESP8266.print(";"+String(sentPulseCount)+";");
     transmitTimeoutMillis = millis();
   }
 
   if (ESP8266.available()) {
     incomingStr = ESP8266.readString();
     Serial.println("Incoming:" + incomingStr);
-    if (incomingStr.toInt() == sentPulseCount)  {
+    if (incomingStr.indexOf("ACK") != -1)  {
       sentPulseCount = 0;
       transmitAck = true;
       Serial.println("Empfang bestaetigt.");

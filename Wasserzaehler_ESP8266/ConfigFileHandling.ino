@@ -14,7 +14,7 @@ bool loadSysConfig() {
   std::unique_ptr<char[]> buf(new char[size]);
   configFile.readBytes(buf.get(), size);
 
-  StaticJsonBuffer<200> jsonBuffer;
+  DynamicJsonBuffer jsonBuffer;
   JsonObject& json = jsonBuffer.parseObject(buf.get());
 
   if (!json.success()) {
@@ -29,7 +29,7 @@ bool loadSysConfig() {
   strcpy(gw,             json["gw"]);
 
   strcpy(ccuip,            json["ccuip"]);
-  strcpy(variable,            json["variable"]);
+  strcpy(variable,         json["variable"]);
 
   ZaehlerWert = json["ZaehlerWert"];
 
