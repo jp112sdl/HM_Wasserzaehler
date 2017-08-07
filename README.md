@@ -11,7 +11,7 @@ Dadurch kam es zu ungewollten Impulsen und Zählvorgängen.
 ## Folgende Bauteile werden benötigt:
 - Wemos D1 Mini
 - Wemos D1 OLED Shield
-- Arduino Pro Mini (ATtiny85-Unterstützung ist in Arbeit - wird umgesetzt, sobald die Lieferung da ist)
+- Arduino Pro Mini
   - +FTDI Adapter zum Programmieren des Arduino Pro Mini
 - stabiles! 5V Netzteil
 - 1 Taster
