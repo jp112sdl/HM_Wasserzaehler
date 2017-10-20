@@ -1,13 +1,13 @@
 bool loadSysConfig() {
   File configFile = SPIFFS.open("/" + configFilename, "r");
   if (!configFile) {
-    Serial.println("Failed to open config file");
+    DEBUG("Failed to open config file");
     return false;
   }
 
   size_t size = configFile.size();
   if (size > 1024) {
-    Serial.println("Config file size is too large");
+    DEBUG("Config file size is too large");
     return false;
   }
 
@@ -18,12 +18,13 @@ bool loadSysConfig() {
   JsonObject& json = jsonBuffer.parseObject(buf.get());
 
   if (!json.success()) {
-    Serial.println("Failed to parse config file");
+    DEBUG("Failed to parse config file");
     return false;
   }
 
+#ifdef SERIALDEBUG
   json.printTo(Serial);
-
+#endif
   ((json["ip"]).as<String>()).toCharArray(ip, IPSize);
   ((json["netmask"]).as<String>()).toCharArray(netmask, IPSize);
   ((json["gw"]).as<String>()).toCharArray(gw, IPSize);
@@ -50,10 +51,12 @@ bool saveSysConfig() {
 
   File configFile = SPIFFS.open("/" + configFilename, "w");
   if (!configFile) {
-    Serial.println("Failed to open config file for writing");
+    DEBUG("Failed to open config file for writing");
     return false;
   }
+#ifdef SERIALDEBUG
   json.printTo(Serial);
+#endif
   json.printTo(configFile);
   return true;
 }

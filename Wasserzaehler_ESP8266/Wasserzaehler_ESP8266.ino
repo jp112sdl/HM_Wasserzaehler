@@ -10,12 +10,36 @@
 Adafruit_SSD1306 display(0);
 SoftwareSerial ATM328(D5, D6);
 
-#define Taster D7
+#define             Taster        D7
+#define             HTTPTIMEOUT   3000
+//#define             UDPDEBUG
+#define             SERIALDEBUG
+#define             DEVICENAME    "WASSERZAEHLER_HAUS "
 
 #define IPSize        16
 #define variableSize 255
 
-unsigned long oldMillis = 0;
+#ifdef UDPDEBUG
+const char * SYSLOGIP = "192.168.1.251";
+#define SYSLOGPORT          514
+#define UDPALIVEMILLIS 1000 * 60 * 15
+#else
+#define UDPALIVEMILLIS 0
+#endif
+
+enum _SyslogSeverity {
+  _slEmergency,
+  _slAlert,
+  _slCritical,
+  _slError,
+  _slWarning,
+  _slNotice,
+  _slInformational,
+  _slDebug
+};
+
+unsigned long lastMillis = 0;
+unsigned long lastUDPALIVEMillis = 0;
 unsigned long keyPressMillis = 0;
 
 bool oldKeyState = HIGH;
@@ -38,6 +62,15 @@ char netmask[IPSize] = "0.0.0.0";
 char gw[IPSize]      = "0.0.0.0";
 bool startWifiManager = false;
 
+bool OTAStart = false;
+
+#define UDPPORT 6678
+struct udp_t {
+  WiFiUDP UDP;
+  char incomingPacket[255];
+  bool Ready = false;
+} UDPClient;
+
 void setup() {
   ATM328.begin(9600);
   Serial.begin(115200);
@@ -51,9 +84,9 @@ void setup() {
   display.println("Start...");
   display.display();
 
-  Serial.println("Begin");
+  DEBUG("Begin");
   if (digitalRead(Taster) == LOW) {
-    Serial.println("Taster = LOW");
+    DEBUG("Taster = LOW");
     startWifiManager = true;
   }
 
@@ -61,15 +94,15 @@ void setup() {
     display.println("SPIFFS");
     display.println("mnt error");
     display.display();
-    Serial.println("Failed to mount file system");
+    DEBUG("Failed to mount file system");
   } else {
     if (!loadSysConfig()) {
-      Serial.println("Failed to load config");
+      DEBUG("Failed to load config");
       display.println("Failed to");
       display.println("load conf");
       display.display();
     } else {
-      Serial.println("Config loaded");
+      DEBUG("Config loaded");
       display.println("Config");
       display.println("loaded");
       display.display();
@@ -85,25 +118,43 @@ void setup() {
     setStateCCUCUxD(variable, String(ZaehlerWert));
   }
   else ESP.restart();
+
+  UDPClient.UDP.begin(UDPPORT);
+  UDPClient.Ready = true;
+
   startOTAhandling();
+
+  DEBUG("START", "loop()", _slInformational);
 }
 
 void loop() {
   ArduinoOTA.handle();
 
+  if (lastUDPALIVEMillis > millis())
+    lastUDPALIVEMillis = millis();
+
+  if (lastMillis > millis())
+    lastMillis = millis();
+
+  if (UDPALIVEMILLIS > 0 && millis() - lastUDPALIVEMillis > UDPALIVEMILLIS) {
+    lastUDPALIVEMillis = millis();
+    DEBUG("ALIVE", "loop()", _slInformational);
+  }
+
   if (ATM328.available()) {
     incomingStr = ATM328.readString();
     if (incomingStr.startsWith(";")) {
-      incomingStr = incomingStr.substring(1,incomingStr.length());
-      incomingStr = incomingStr.substring(0,incomingStr.indexOf(";"));
-      Serial.println("incomingStr = " + incomingStr);
+      incomingStr = incomingStr.substring(1, incomingStr.length());
+      incomingStr = incomingStr.substring(0, incomingStr.indexOf(";"));
+      DEBUG("incomingStr = " + incomingStr, "loop()", _slInformational);
       if (incomingStr.toInt() < 2147483646) {
         ZaehlerWert = ZaehlerWert + incomingStr.toInt();
         saveSysConfig();
         if (!setStateCCUCUxD(variable, String(ZaehlerWert))) {
+          DEBUG("1. Versuch setStateCCUCUxD() fehlgeschlagen. 2. Versuch...", "loop()", _slWarning);
           setStateCCUCUxD(variable, String(ZaehlerWert));
         }
-      }
+      } else DEBUG("incomingStr = " + incomingStr, "loop()", _slWarning);
     }
     ATM328.print("ACK;ACK;ACK");
   }
@@ -137,7 +188,7 @@ void loop() {
     counterReset = false;
   }
 
-  if (millis() - oldMillis > 1000 && digitalRead(Taster) != LOW) {
+  if (millis() - lastMillis > 1000 && digitalRead(Taster) != LOW) {
     display.clearDisplay();
     display.setCursor(0, 5);
     display.setTextColor(BLACK, WHITE);

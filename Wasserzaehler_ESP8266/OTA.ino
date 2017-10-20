@@ -1,24 +1,27 @@
 void startOTAhandling() {
+  DEBUG("Starte OTA-Handler...","OTA",_slInformational);
   ArduinoOTA.onStart([]() {
-    Serial.println("Start updating ");
+    DEBUG(F("Start updating"),"OTA",_slInformational);
+    OTAStart = true;
   });
   ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
+    DEBUG("\nEnd","OTA",_slInformational);
+    OTAStart = false;
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    //Serial.printf(".");
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    OTAStart = false;
+    DEBUG("Error "+String(error)+": ","OTA",_slError);
+    if (error == OTA_AUTH_ERROR) DEBUG("Auth Failed","OTA",_slError);
+    else if (error == OTA_BEGIN_ERROR) DEBUG("Begin Failed","OTA",_slError);
+    else if (error == OTA_CONNECT_ERROR) DEBUG("Connect Failed","OTA",_slError);
+    else if (error == OTA_RECEIVE_ERROR) DEBUG("Receive Failed","OTA",_slError);
+    else if (error == OTA_END_ERROR) DEBUG("End Failed","OTA",_slError);
   });
 
   String Hostname = "ESP-WZ-OTA-" + WiFi.macAddress();
-
   ArduinoOTA.setHostname(Hostname.c_str());
   ArduinoOTA.begin();
 }

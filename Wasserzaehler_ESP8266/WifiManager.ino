@@ -6,7 +6,7 @@ bool doWifiConnect() {
   for (int i = 0; i < _psk.length(); i++) {
     _pskMask += "*";
   }
-  Serial.println("ssid = " + _ssid + ", psk = " + _pskMask);
+  DEBUG("ssid = " + _ssid + ", psk = " + _pskMask);
 
   const char* ipStr = ip; byte ipBytes[4]; parseBytes(ipStr, '.', ipBytes, 4, 10);
   const char* netmaskStr = netmask; byte netmaskBytes[4]; parseBytes(netmaskStr, '.', netmaskBytes, 4, 10);
@@ -14,7 +14,7 @@ bool doWifiConnect() {
 
 
   if (!startWifiManager && _ssid != "" && _psk != "" ) {
-    Serial.println("Connecting WLAN the classic way...");
+    DEBUG("Connecting WLAN the classic way...");
     WiFi.disconnect();
     WiFi.mode(WIFI_STA);
     WiFi.begin(_ssid.c_str(), _psk.c_str());
@@ -30,7 +30,7 @@ bool doWifiConnect() {
       }
       delay(500);
     }
-    Serial.println("Wifi Connected");
+    DEBUG("Wifi Connected");
     return true;
   } else {
     WiFiManager wifiManager;
@@ -61,7 +61,7 @@ bool doWifiConnect() {
       }
       else {
         if (!wifiManager.startConfigPortal(Hostname.c_str())) {
-          Serial.println("failed to connect and hit timeout");
+          DEBUG("failed to connect and hit timeout");
           delay(1000);
           ESP.restart();
         }
@@ -72,11 +72,11 @@ bool doWifiConnect() {
 
     wifiManager.autoConnect(Hostname.c_str());
 
-    Serial.println("Wifi Connected");
-    Serial.println("CUSTOM STATIC IP: " + String(ip) + " Netmask: " + String(netmask) + " GW: " + String(gw));
+    DEBUG("Wifi Connected");
+    DEBUG("CUSTOM STATIC IP: " + String(ip) + " Netmask: " + String(netmask) + " GW: " + String(gw));
     if (shouldSaveConfig) {
       if (String(custom_ip.getValue()).length() > 5) {
-        Serial.println("Custom IP Address is set!");
+        DEBUG("Custom IP Address is set!");
         strcpy(ip, custom_ip.getValue());
         strcpy(netmask, custom_netmask.getValue());
         strcpy(gw, custom_gw.getValue());
@@ -99,12 +99,12 @@ bool doWifiConnect() {
   }
 }
 void configModeCallback (WiFiManager *myWiFiManager) {
-  Serial.println("AP-Mode active!");
+  DEBUG("AP-Mode active!");
   display.clearDisplay();  display.setCursor(0, 0); display.println("AP-MODE!"); display.display();
 }
 
 void saveConfigCallback () {
-  Serial.println("Should save config");
+  DEBUG("Should save config");
   shouldSaveConfig = true;
 }
 

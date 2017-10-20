@@ -2,18 +2,16 @@ bool setStateCCUCUxD(String id, String value) {
   if (WiFi.status() == WL_CONNECTED)
   {
     HTTPClient http;
-    http.setTimeout(3000);
+    http.setTimeout(HTTPTIMEOUT);
     String url = "http://" + String(ccuip) + ":8181/cuxd.exe?ret=dom.GetObject(%22" + id + "%22).State(" + value + ")";
-    Serial.println("setStateCCUCUxD url: " + url);
     http.begin(url);
     int httpCode = http.GET();
     String payload = "";
-    Serial.println("setStateCCUCUxD HTTP ReturnCode = " + String(httpCode));
 
     if (httpCode != 200) {
-      Serial.println("HTTP " + id +  " / " + value + " fail");
+      DEBUG("HTTP " + id +  " / " + value + " fail ("+String(httpCode)+")","setStateCCUCUxD()",_slError);
     } else {
-      Serial.println("HTTP " + id +  " / " + value + " success");
+      DEBUG("HTTP " + id +  " / " + value + " success", "setStateCCUCUxD()",_slInformational);
       payload = http.getString();
     }
 
@@ -21,7 +19,7 @@ bool setStateCCUCUxD(String id, String value) {
 
     payload = payload.substring(payload.indexOf("<ret>"));
     payload = payload.substring(5, payload.indexOf("</ret>"));
-    Serial.println("setStateCCUCUxD payload = " + payload);
+    //DEBUG("setStateCCUCUxD payload = " + payload);
 
     return (payload != "null" && httpCode == 200);
 
