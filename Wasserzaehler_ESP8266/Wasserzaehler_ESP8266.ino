@@ -12,6 +12,9 @@ SoftwareSerial ATM328(D5, D6);
 
 #define Taster D7
 
+#define IPSize        16
+#define variableSize 255
+
 unsigned long oldMillis = 0;
 unsigned long keyPressMillis = 0;
 
@@ -24,15 +27,15 @@ unsigned int ZaehlerWert = 0;
 
 String configFilename = "sysconf.json";
 
-char ccuip[16] = "";
-char variable[255]  = "";
+char ccuip[IPSize] = "";
+char variable[variableSize]  = "";
 
 //WifiManager - don't touch
 bool shouldSaveConfig        = false;
 #define wifiManagerDebugOutput   true
-char ip[16]      = "0.0.0.0";
-char netmask[16] = "0.0.0.0";
-char gw[16]      = "0.0.0.0";
+char ip[IPSize]      = "0.0.0.0";
+char netmask[IPSize] = "0.0.0.0";
+char gw[IPSize]      = "0.0.0.0";
 bool startWifiManager = false;
 
 void setup() {

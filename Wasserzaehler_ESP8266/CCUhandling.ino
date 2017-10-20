@@ -2,7 +2,7 @@ bool setStateCCUCUxD(String id, String value) {
   if (WiFi.status() == WL_CONNECTED)
   {
     HTTPClient http;
-    http.setTimeout(5000);
+    http.setTimeout(3000);
     String url = "http://" + String(ccuip) + ":8181/cuxd.exe?ret=dom.GetObject(%22" + id + "%22).State(" + value + ")";
     Serial.println("setStateCCUCUxD url: " + url);
     http.begin(url);

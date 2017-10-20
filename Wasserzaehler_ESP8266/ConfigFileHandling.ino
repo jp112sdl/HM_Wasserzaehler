@@ -24,12 +24,11 @@ bool loadSysConfig() {
 
   json.printTo(Serial);
 
-  strcpy(ip,             json["ip"]);
-  strcpy(netmask,        json["netmask"]);
-  strcpy(gw,             json["gw"]);
-
-  strcpy(ccuip,            json["ccuip"]);
-  strcpy(variable,         json["variable"]);
+  ((json["ip"]).as<String>()).toCharArray(ip, IPSize);
+  ((json["netmask"]).as<String>()).toCharArray(netmask, IPSize);
+  ((json["gw"]).as<String>()).toCharArray(gw, IPSize);
+  ((json["ccuip"]).as<String>()).toCharArray(ccuip, IPSize);
+  ((json["variable"]).as<String>()).toCharArray(variable, variableSize);
 
   ZaehlerWert = json["ZaehlerWert"];
 
@@ -43,10 +42,10 @@ bool saveSysConfig() {
   json["ip"] = ip;
   json["netmask"] = netmask;
   json["gw"] = gw;
-  
+
   json["ccuip"] = ccuip;
   json["variable"] = variable;
-  
+
   json["ZaehlerWert"] = ZaehlerWert;
 
   File configFile = SPIFFS.open("/" + configFilename, "w");
