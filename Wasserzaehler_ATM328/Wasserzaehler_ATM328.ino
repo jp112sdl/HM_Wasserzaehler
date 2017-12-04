@@ -7,7 +7,7 @@
 #define TransmitDelaySeconds         15
 #define ReTransmitDelaySeconds       10
 #define PulseDelayMilliSeconds       500
-#define LDRHIGH                      220   //Anbau = 220; Haus = 540
+#define LDRHIGH                      320   //Anbau = 320; Haus = 540
 #define LDRLOW                       50   //Anbau = 50;  Haus = 490
 
 SoftwareSerial ESP8266(RX, TX);
