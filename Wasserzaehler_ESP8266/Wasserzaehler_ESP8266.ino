@@ -11,10 +11,10 @@ Adafruit_SSD1306 display(0);
 SoftwareSerial ATM328(D5, D6);
 
 #define             Taster        D7
-#define             HTTPTIMEOUT   3000
+#define             HTTPTIMEOUT   1500
 //#define             UDPDEBUG
 #define             SERIALDEBUG
-#define             DEVICENAME    "WASSERZAEHLER_HAUS "
+#define             DEVICENAME    "WASSERZAEHLER_HAUS"
 
 #define IPSize        16
 #define variableSize 255
